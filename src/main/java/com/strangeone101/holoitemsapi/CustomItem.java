@@ -7,8 +7,6 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -29,7 +27,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.w3c.dom.Attr;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -59,6 +56,7 @@ public class CustomItem {
     private List<String> lore = new ArrayList<>();
     private boolean jsonLore = false;
     private int maxDurability = 0;
+    private int cooldown = 0;
     private boolean stackable = true;
     private Set<Property> properties = new HashSet<>();
     private Set<StatsWrapper<?>> statGoals;
@@ -463,6 +461,48 @@ public class CustomItem {
     public CustomItem setMaterial(Material material) {
         this.material = material;
         return this;
+    }
+
+    /**
+     * Gets the cooldown of the item
+     * @return The cooldown in milliseconds
+     */
+    public int getCooldown() {
+        return cooldown;
+    }
+
+    /**
+     * Sets the cooldown of the item
+     * @param cooldown The cooldown of the item in millisecond
+     */
+    public void setCooldown(int cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    /**
+     * Applies a cooldown to an itemstack by storing the next time the item can be used.
+     * @param item The itemStack
+     * @return The itemStack with the cooldown.
+     */
+    public ItemStack applyCooldown(ItemStack item) {
+        ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : Bukkit.getItemFactory().getItemMeta(item.getType());
+        Properties.COOLDOWN.set(meta.getPersistentDataContainer(), System.currentTimeMillis() + getCooldown());
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    /**
+     * Checks if an item is on cooldown or not. If the plugin fails to get the meta then it returns false.
+     * @param item The item
+     * @return True if it's on cooldown. False otherwise.
+     */
+    public boolean checkCooldown(ItemStack item) {
+        if (!item.hasItemMeta())
+            return false;
+        if (Properties.COOLDOWN.has(item.getItemMeta().getPersistentDataContainer())){
+            return Properties.COOLDOWN.get(item.getItemMeta().getPersistentDataContainer()) >= System.currentTimeMillis();
+        }
+        return false;
     }
 
     /**
