@@ -2,6 +2,7 @@ package com.strangeone101.holoitemsapi;
 
 import com.strangeone101.holoitemsapi.util.ItemUtils;
 import com.strangeone101.holoitemsapi.util.ReflectionUtils;
+import com.strangeone101.holoitemsapi.util.StatsWrapper;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -60,6 +61,7 @@ public class CustomItem {
     private int maxDurability = 0;
     private boolean stackable = true;
     private Set<Property> properties = new HashSet<>();
+    private Set<StatsWrapper<?>> statGoals;
     private String extraData;
     private Random random;
     private boolean ench;
@@ -461,6 +463,33 @@ public class CustomItem {
     public CustomItem setMaterial(Material material) {
         this.material = material;
         return this;
+    }
+
+    /**
+     * Gets all the stat goals needed to unlock/use the item.
+     * @return A set of StatsWrappers
+     */
+    public Set<StatsWrapper<?>> getStatGoals() {
+        return statGoals;
+    }
+
+    /**
+     * Sets the stat goals needed to unlock/use the item
+     * @param statGoals A set of StatsWrappers
+     */
+    public void setStatGoals(Set<StatsWrapper<?>> statGoals) {
+        this.statGoals = statGoals;
+    }
+
+    /**
+     * Checks if a player passes all the stat goals
+     * @param player The player to check
+     * @return True if there is no stat goals, or the player passes all stat goals. False otherwise.
+     */
+    public boolean checkStatGoals(Player player) {
+        if (getStatGoals() == null)
+            return true;
+        return getStatGoals().stream().allMatch(stat -> stat.checkPlayer(player));
     }
 
     /**
