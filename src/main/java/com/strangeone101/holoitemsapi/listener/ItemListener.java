@@ -44,6 +44,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRecipeDiscoverEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -183,12 +184,12 @@ public class ItemListener implements Listener {
 
             //Run BlockInteractables before GUI checks
             if (customItem instanceof BlockInteractable && block != null) {
+                //Use the item on the block
                 if (((BlockInteractable)customItem).onInteract(player, block, customItem,
                         item, event.getAction() == Action.LEFT_CLICK_BLOCK)) {
                     event.setUseInteractedBlock(Event.Result.DENY);
-                    //event.setCancelled(true);
                 }
-                if (item == null || item.getType() == Material.AIR)
+                if (item == null || item.getType() == Material.AIR) //Delete the item forcefully if it's set to air
                     player.getInventory().setItem(event.getHand(), null);
                 return;
             }
@@ -205,7 +206,6 @@ public class ItemListener implements Listener {
                 if (customItem instanceof Interactable) {
                     if (((Interactable)customItem).onInteract(player, customItem, item)) {
                         event.setUseItemInHand(Event.Result.DENY);
-                        //event.setCancelled(true);
                     }
                     if (item == null || item.getType() == Material.AIR)
                         player.getInventory().setItem(event.getHand(), null);
@@ -299,6 +299,12 @@ public class ItemListener implements Listener {
     public void onSlotSwitch(PlayerItemHeldEvent event) {
         //Update the cached held item
         EventCache.updateHeldSlot(event.getPlayer(), event.getPreviousSlot(), event.getNewSlot());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onOffhandHotkey(PlayerSwapHandItemsEvent event) {
+        // Swap cache slots between offhand and mainhand
+        EventCache.swapCacheSlots(event.getPlayer(), 40, event.getPlayer().getInventory().getHeldItemSlot());
     }
 
     @EventHandler(ignoreCancelled = true)
