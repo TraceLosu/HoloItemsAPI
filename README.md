@@ -7,7 +7,7 @@ Include this in your pom.xml
 <repositories>
     <repository>
         <id>github</id>
-        <url>https://raw.githubusercontent.com/StrangeOne101/HoloItemsAPI/repository/</url>
+        <url>https://raw.githubusercontent.com/TraceLosu/HoloItemsAPI/mvn-repo/</url>
     </repository>
 </repositories>
 
@@ -15,7 +15,7 @@ Include this in your pom.xml
     <dependency>
         <groupId>com.strangeone101</groupId>
         <artifactId>HoloItemsAPI</artifactId>
-        <version>0.7.4</version>
+        <version>0.8.6-hlc</version>
         <type>jar</type>
     </dependency>
 </dependencies>
