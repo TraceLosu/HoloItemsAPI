@@ -1,5 +1,8 @@
 package com.strangeone101.holoitemsapi.util;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 
@@ -13,7 +16,12 @@ public class VoidStatsWrapper extends StatsWrapper<Void>{
     }
 
     @Override
-    public boolean checkPlayer(Player player) {
+    public boolean checkPlayer(OfflinePlayer player) {
         return player.getStatistic(getStatistic()) >= getGoal();
+    }
+
+    @Override
+    public int inspectPlayer(OfflinePlayer player) {
+        return getGoal() - player.getStatistic(getStatistic());
     }
 }

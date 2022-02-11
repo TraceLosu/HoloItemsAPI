@@ -13,8 +13,10 @@ import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.Statistic;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -27,6 +29,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -153,7 +156,7 @@ public class CustomItem {
         Properties.UNSTACKABLE.set(meta.getPersistentDataContainer(), !isStackable());
 
         if (ench) {
-            stack.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
+            stack.addUnsafeEnchantment(Enchantment.LURE, 1);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
@@ -182,6 +185,34 @@ public class CustomItem {
         }
 
         return stack;
+    }
+
+    /**
+     * Builds an ItemStack that should only be used for showing an item through an inventory or any other methods
+     * that does not allow the player to use the item. This will add missing statistics to the lore.
+     * @return An ItemStack with extra information.
+     */
+    public ItemStack buildGuiStack(OfflinePlayer player) {
+        var itemStack = this.buildStack(null);
+        var itemStackMeta = itemStack.getItemMeta();
+        List<String> lore;
+        if (itemStackMeta.hasLore()) {
+            lore = itemStackMeta.getLore();
+        } else {
+            lore = new ArrayList<>();
+        }
+
+        var remainingStats = inspectStatGoals(player);
+        if (remainingStats.isEmpty()) {
+            return itemStack;
+        }
+
+        for (var statistic : remainingStats.keySet()) {
+            lore.add(ChatColor.BLUE + statistic.toString() + ChatColor.RESET + " | " + ChatColor.RED + remainingStats.get(statistic));
+        }
+
+        itemStack.setItemMeta(itemStackMeta);
+        return itemStack;
     }
 
     /**
@@ -530,6 +561,24 @@ public class CustomItem {
         if (getStatGoals() == null)
             return true;
         return getStatGoals().stream().allMatch(stat -> stat.checkPlayer(player));
+    }
+
+    /**
+     * Returns a map that contains what stat goals the player hasn't reached. The map will not contain stat goals
+     * that the player has passed.
+     * @param player The player to check against.
+     * @return A map, with the key being the statistic, and the value being the remaining goal.
+     */
+    @NonNull
+    public Map<Statistic, Integer> inspectStatGoals(OfflinePlayer player) {
+        Map<Statistic, Integer> remainingStats = new HashMap<>();
+        if (getStatGoals() == null || getStatGoals().isEmpty())
+            return remainingStats;
+
+        getStatGoals().stream().filter(stat -> !stat.checkPlayer(player)).forEach(stat -> {
+            remainingStats.put(stat.getStatistic(), stat.inspectPlayer(player));
+        });
+        return remainingStats;
     }
 
     /**

@@ -1,7 +1,11 @@
 package com.strangeone101.holoitemsapi.util;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
+
+import java.util.Map;
 
 public abstract class StatsWrapper<T> {
 
@@ -27,5 +31,7 @@ public abstract class StatsWrapper<T> {
         return specifier;
     }
 
-    public abstract boolean checkPlayer(Player player);
+    public abstract boolean checkPlayer(OfflinePlayer player);
+
+    public abstract int inspectPlayer(OfflinePlayer player);
 }
