@@ -6,7 +6,7 @@
 
     <groupId>com.strangeone101</groupId>
     <artifactId>HoloItemsAPI</artifactId>
-    <version>0.8.7-hlc</version>
+    <version>0.8.8-hlc</version>
     <packaging>jar</packaging>
 
     <name>HoloItemsAPI</name>

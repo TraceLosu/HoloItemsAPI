@@ -7,6 +7,7 @@ import com.strangeone101.holoitemsapi.Properties;
 import com.strangeone101.holoitemsapi.abilities.FoodAbility;
 import com.strangeone101.holoitemsapi.interfaces.BlockInteractable;
 import com.strangeone101.holoitemsapi.interfaces.Edible;
+import com.strangeone101.holoitemsapi.interfaces.Enchantable;
 import com.strangeone101.holoitemsapi.interfaces.EntityInteractable;
 import com.strangeone101.holoitemsapi.interfaces.Interactable;
 import com.strangeone101.holoitemsapi.interfaces.Placeable;
@@ -652,7 +653,9 @@ public class ItemListener implements Listener {
                 return true; //Block all other exceptions
 
             } else if (CustomItemRegistry.isCustomItem(slot2)) {
-                return true; //Prevent custom items from being used to repair
+                CustomItem ci2 = CustomItemRegistry.getCustomItem(slot2);
+                return !(ci2 instanceof Enchantable);
+                // Prevent custom items from being used to repair if, and only if, it is not enchantable.
             }
             return false;
         } else if (inventory instanceof MerchantInventory) {
