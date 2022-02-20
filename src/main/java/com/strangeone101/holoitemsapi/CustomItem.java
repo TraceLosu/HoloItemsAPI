@@ -26,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -128,12 +127,6 @@ public class CustomItem {
             meta.setLore(lore);
         }
         if (internalIntID != 0) meta.setCustomModelData(internalIntID); //Used for resource packs
-
-        if (meta instanceof SkullMeta) {
-            if (extraData != null) {
-                ItemUtils.setSkin((SkullMeta) meta, extraData);
-            }
-        }
 
         if (player != null) {
             if (properties.contains(Properties.OWNER)) {
@@ -267,11 +260,6 @@ public class CustomItem {
             ((LeatherArmorMeta) meta).setColor(Color.fromRGB(hex));
         }
         if (internalIntID != 0) meta.setCustomModelData(internalIntID); //Used for resource packs
-        if (meta instanceof SkullMeta) {
-            if (extraData != null) {
-                ItemUtils.setSkin((SkullMeta) meta, extraData);
-            }
-        }
 
         if (ench) {
             stack.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
