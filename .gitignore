@@ -111,3 +111,7 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
