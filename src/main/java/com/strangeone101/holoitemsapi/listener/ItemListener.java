@@ -4,7 +4,6 @@ import com.strangeone101.holoitemsapi.CustomItem;
 import com.strangeone101.holoitemsapi.CustomItemRegistry;
 import com.strangeone101.holoitemsapi.HoloItemsAPI;
 import com.strangeone101.holoitemsapi.Properties;
-import com.strangeone101.holoitemsapi.abilities.FoodAbility;
 import com.strangeone101.holoitemsapi.interfaces.BlockInteractable;
 import com.strangeone101.holoitemsapi.interfaces.Edible;
 import com.strangeone101.holoitemsapi.interfaces.Enchantable;
@@ -210,13 +209,6 @@ public class ItemListener implements Listener {
                     }
                     if (item == null || item.getType() == Material.AIR)
                         player.getInventory().setItem(event.getHand(), null);
-                    return;
-                }
-
-                if (customItem instanceof Edible) {
-                    event.setUseItemInHand(Event.Result.DENY);
-                    new FoodAbility(player, item, player.getInventory(),
-                            event.getHand() == EquipmentSlot.OFF_HAND ? 40 : player.getInventory().getHeldItemSlot());
                     return;
                 }
 
