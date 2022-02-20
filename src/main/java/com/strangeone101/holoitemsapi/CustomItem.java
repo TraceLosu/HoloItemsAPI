@@ -73,7 +73,6 @@ public class CustomItem {
 
     private Map<Attribute, Map<AttributeModifier.Operation, Double>> attributes = new HashMap<>();
     private Map<String, Function<PersistentDataContainer, String>> variables = new HashMap<>();
-    private Map<String, Object> nbt = new HashMap<>();
 
     private CustomItem(String name) {
         this.name = name.toLowerCase();
@@ -178,10 +177,6 @@ public class CustomItem {
         if (onBuild != null) {
             meta = stack.getItemMeta();
             onBuild.accept(stack, meta);
-        }
-
-        for (String key : nbt.keySet()) {
-            stack = HoloItemsAPI.getNMS().writeNBT(nbt.get(key), key, stack);
         }
 
         return stack;
@@ -301,10 +296,6 @@ public class CustomItem {
         if (onUpdate != null) {
             meta = stack.getItemMeta();
             onUpdate.accept(stack, meta);
-        }
-
-        for (String key : nbt.keySet()) {
-            stack = HoloItemsAPI.getNMS().writeNBT(nbt.get(key), key, stack);
         }
 
         return stack;
@@ -943,25 +934,6 @@ public class CustomItem {
      */
     public int getLeatherColor() {
         return this.hex;
-    }
-
-    /**
-     * Adds NBT to this item
-     * @param key The key
-     * @param value The value. Must be a primitive type, String, UUID or array (array of either byte, int, short or long)
-     * @return Itself
-     */
-    public CustomItem addNBT(String key, Object value) {
-        this.nbt.put(key, value);
-        return this;
-    }
-
-    /**
-     * Get the NBT that should be set on this item
-     * @return The NBT
-     */
-    public Map<String, Object> getNbt() {
-        return nbt;
     }
 
     /**
