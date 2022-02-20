@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -53,17 +52,15 @@ public class CustomItem {
     private int internalIntID;
 
     private Material material;
-    private Material fakeMaterial;
     private String displayName;
     private List<String> lore = new ArrayList<>();
     private boolean jsonLore = false;
     private int maxDurability = 0;
     private int cooldown = 0;
     private boolean stackable = true;
-    private Set<Property> properties = new HashSet<>();
+    private Set<Property<?>> properties = new HashSet<>();
     private Set<StatsWrapper<?>> statGoals;
     private String extraData;
-    private Random random;
     private boolean ench;
     private int hex;
     private ItemFlag[] flags;
@@ -80,7 +77,6 @@ public class CustomItem {
     public CustomItem(String name, Material material) {
         this(name);
         this.material = material;
-        this.random = new Random(name.hashCode());
     }
 
     public CustomItem(String name, Material material, String displayName) {
@@ -108,7 +104,6 @@ public class CustomItem {
      */
     public ItemStack buildStack(Player player) {
         ItemStack stack = new ItemStack(getMaterial());
-        this.random = new Random(name.hashCode());
         ItemMeta meta = stack.getItemMeta();
 
         //It's important to use the functions `getDisplayName()` and `getLore()` bellow
@@ -708,7 +703,7 @@ public class CustomItem {
      * Get the properties of this item
      * @return The properties
      */
-    public Set<Property> getProperties() {
+    public Set<Property<?>> getProperties() {
         return properties;
     }
 
@@ -717,7 +712,7 @@ public class CustomItem {
      * @param property The property
      * @return Itself
      */
-    public CustomItem addProperty(Property property) {
+    public CustomItem addProperty(Property<?> property) {
         this.properties.add(property);
         return this;
     }
@@ -873,11 +868,6 @@ public class CustomItem {
 
     public Map<Attribute, Map<AttributeModifier.Operation, Double>> getAttributes() {
         return attributes;
-    }
-
-    public CustomItem setVisibleMaterial(Material material) {
-        this.fakeMaterial = material;
-        return this;
     }
 
     /**

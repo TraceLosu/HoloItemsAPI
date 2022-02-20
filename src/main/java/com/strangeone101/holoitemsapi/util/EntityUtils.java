@@ -8,8 +8,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Ageable;
-import org.bukkit.entity.AnimalTamer;
-import org.bukkit.entity.Breedable;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -20,7 +18,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Llama;
 import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Rabbit;
-import org.bukkit.entity.Sheep;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.TropicalFish;
@@ -28,8 +25,6 @@ import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.memory.MemoryKey;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Colorable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
@@ -121,7 +116,7 @@ public class EntityUtils {
             if (!test(flags, SKIP_MEMORIES)) {
                 Map<String, Object> memories = new HashMap<>();
 
-                for (MemoryKey key : MemoryKey.values()) {
+                for (MemoryKey<?> key : MemoryKey.values()) {
                     Object o = ((LivingEntity) entity).getMemory(key);
                     if (o != null) memories.put(key.toString(), o);
                 }
