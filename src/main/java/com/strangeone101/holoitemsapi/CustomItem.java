@@ -11,8 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
+import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -46,9 +48,9 @@ import java.util.function.Function;
  * A class for creating custom items. Be sure to call {@link #register()} after creating it
  * to properly register it
  */
-public class CustomItem {
+public class CustomItem implements Keyed {
 
-    private String name;
+    private NamespacedKey key;
     private int internalIntID;
 
     private Material material;
@@ -71,7 +73,7 @@ public class CustomItem {
     private Map<String, Function<PersistentDataContainer, String>> variables = new HashMap<>();
 
     private CustomItem(String name) {
-        this.name = name.toLowerCase();
+        this.key = new NamespacedKey(HoloItemsAPI.getPlugin(), name);
     }
 
     public CustomItem(String name, Material material) {
@@ -89,12 +91,17 @@ public class CustomItem {
         this.lore = lore;
     }
 
+    @Override
+    public final NamespacedKey getKey() {
+        return key;
+    }
+
     /**
      * Gets the internal name of this custom item
      * @return The internal name
      */
     public final String getInternalName() {
-        return name;
+        return getKey().getKey();
     }
 
     /**
@@ -720,7 +727,7 @@ public class CustomItem {
     @Override
     public String toString() {
         return "CustomItem{" +
-                "name='" + name + '\'' +
+                "name='" + getInternalName() + '\'' +
                 ", textureID=" + internalIntID +
                 ", material=" + material +
                 ", displayName='" + displayName + "\'\u00A7r'" +
@@ -738,12 +745,12 @@ public class CustomItem {
 
         CustomItem that = (CustomItem) o;
 
-        return name.equals(that.name);
+        return getKey().equals(that.getKey());
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return getKey().hashCode();
     }
 
     public CustomItem setAttribute(Attribute attribute, double amount, boolean percentage) {
