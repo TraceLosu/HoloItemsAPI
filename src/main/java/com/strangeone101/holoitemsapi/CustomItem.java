@@ -11,8 +11,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
+import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -26,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -38,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -48,23 +48,21 @@ import java.util.function.Function;
  * A class for creating custom items. Be sure to call {@link #register()} after creating it
  * to properly register it
  */
-public class CustomItem {
+public class CustomItem implements Keyed {
 
-    private String name;
+    private NamespacedKey key;
     private int internalIntID;
 
     private Material material;
-    private Material fakeMaterial;
     private String displayName;
     private List<String> lore = new ArrayList<>();
     private boolean jsonLore = false;
     private int maxDurability = 0;
     private int cooldown = 0;
     private boolean stackable = true;
-    private Set<Property> properties = new HashSet<>();
+    private Set<Property<?>> properties = new HashSet<>();
     private Set<StatsWrapper<?>> statGoals;
     private String extraData;
-    private Random random;
     private boolean ench;
     private int hex;
     private ItemFlag[] flags;
@@ -73,16 +71,14 @@ public class CustomItem {
 
     private Map<Attribute, Map<AttributeModifier.Operation, Double>> attributes = new HashMap<>();
     private Map<String, Function<PersistentDataContainer, String>> variables = new HashMap<>();
-    private Map<String, Object> nbt = new HashMap<>();
 
     private CustomItem(String name) {
-        this.name = name.toLowerCase();
+        this.key = new NamespacedKey(HoloItemsAPI.getPlugin(), name);
     }
 
     public CustomItem(String name, Material material) {
         this(name);
         this.material = material;
-        this.random = new Random(name.hashCode());
     }
 
     public CustomItem(String name, Material material, String displayName) {
@@ -95,12 +91,17 @@ public class CustomItem {
         this.lore = lore;
     }
 
+    @Override
+    public final NamespacedKey getKey() {
+        return key;
+    }
+
     /**
      * Gets the internal name of this custom item
      * @return The internal name
      */
     public final String getInternalName() {
-        return name;
+        return getKey().getKey();
     }
 
     /**
@@ -110,7 +111,6 @@ public class CustomItem {
      */
     public ItemStack buildStack(Player player) {
         ItemStack stack = new ItemStack(getMaterial());
-        this.random = new Random(name.hashCode());
         ItemMeta meta = stack.getItemMeta();
 
         //It's important to use the functions `getDisplayName()` and `getLore()` bellow
@@ -129,12 +129,6 @@ public class CustomItem {
             meta.setLore(lore);
         }
         if (internalIntID != 0) meta.setCustomModelData(internalIntID); //Used for resource packs
-
-        if (meta instanceof SkullMeta) {
-            if (extraData != null) {
-                ItemUtils.setSkin((SkullMeta) meta, extraData);
-            }
-        }
 
         if (player != null) {
             if (properties.contains(Properties.OWNER)) {
@@ -178,10 +172,6 @@ public class CustomItem {
         if (onBuild != null) {
             meta = stack.getItemMeta();
             onBuild.accept(stack, meta);
-        }
-
-        for (String key : nbt.keySet()) {
-            stack = HoloItemsAPI.getNMS().writeNBT(nbt.get(key), key, stack);
         }
 
         return stack;
@@ -272,11 +262,6 @@ public class CustomItem {
             ((LeatherArmorMeta) meta).setColor(Color.fromRGB(hex));
         }
         if (internalIntID != 0) meta.setCustomModelData(internalIntID); //Used for resource packs
-        if (meta instanceof SkullMeta) {
-            if (extraData != null) {
-                ItemUtils.setSkin((SkullMeta) meta, extraData);
-            }
-        }
 
         if (ench) {
             stack.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 1);
@@ -301,10 +286,6 @@ public class CustomItem {
         if (onUpdate != null) {
             meta = stack.getItemMeta();
             onUpdate.accept(stack, meta);
-        }
-
-        for (String key : nbt.keySet()) {
-            stack = HoloItemsAPI.getNMS().writeNBT(nbt.get(key), key, stack);
         }
 
         return stack;
@@ -729,7 +710,7 @@ public class CustomItem {
      * Get the properties of this item
      * @return The properties
      */
-    public Set<Property> getProperties() {
+    public Set<Property<?>> getProperties() {
         return properties;
     }
 
@@ -738,7 +719,7 @@ public class CustomItem {
      * @param property The property
      * @return Itself
      */
-    public CustomItem addProperty(Property property) {
+    public CustomItem addProperty(Property<?> property) {
         this.properties.add(property);
         return this;
     }
@@ -746,7 +727,7 @@ public class CustomItem {
     @Override
     public String toString() {
         return "CustomItem{" +
-                "name='" + name + '\'' +
+                "name='" + getInternalName() + '\'' +
                 ", textureID=" + internalIntID +
                 ", material=" + material +
                 ", displayName='" + displayName + "\'\u00A7r'" +
@@ -764,12 +745,12 @@ public class CustomItem {
 
         CustomItem that = (CustomItem) o;
 
-        return name.equals(that.name);
+        return getKey().equals(that.getKey());
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return getKey().hashCode();
     }
 
     public CustomItem setAttribute(Attribute attribute, double amount, boolean percentage) {
@@ -896,11 +877,6 @@ public class CustomItem {
         return attributes;
     }
 
-    public CustomItem setVisibleMaterial(Material material) {
-        this.fakeMaterial = material;
-        return this;
-    }
-
     /**
      * Run some code when this item is built. Used in case you don't want to create
      * a new class just to change something about the item.
@@ -943,25 +919,6 @@ public class CustomItem {
      */
     public int getLeatherColor() {
         return this.hex;
-    }
-
-    /**
-     * Adds NBT to this item
-     * @param key The key
-     * @param value The value. Must be a primitive type, String, UUID or array (array of either byte, int, short or long)
-     * @return Itself
-     */
-    public CustomItem addNBT(String key, Object value) {
-        this.nbt.put(key, value);
-        return this;
-    }
-
-    /**
-     * Get the NBT that should be set on this item
-     * @return The NBT
-     */
-    public Map<String, Object> getNbt() {
-        return nbt;
     }
 
     /**

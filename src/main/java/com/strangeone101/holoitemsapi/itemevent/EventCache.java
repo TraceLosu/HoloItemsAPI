@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,10 +108,10 @@ public class EventCache {
         if (LOG_DEBUG) Bukkit.getLogger().info("Full cache end on " + player);
     }
 
-    public static void release(Player player) {
+    public static <E extends Event> void release(Player player) {
         CACHED_POSITIONS_BY_SLOT.remove(player);
 
-        for (Class key : CACHED_POSITIONS_BY_EVENT.keySet()) {
+        for (Class<?> key : CACHED_POSITIONS_BY_EVENT.keySet()) {
             CACHED_POSITIONS_BY_EVENT.get(key).remove(player);
         }
 

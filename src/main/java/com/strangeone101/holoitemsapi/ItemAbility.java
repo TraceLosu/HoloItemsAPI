@@ -95,7 +95,7 @@ public abstract class ItemAbility {
      */
     public static <T extends ItemAbility> T getAbility(Player player, Class<T> clazz) {
         if (isAbilityActive(player, clazz)) {
-            return (T) INSTANCES.get(player).get(clazz);
+            return clazz.cast(INSTANCES.get(player).get(clazz));
         }
         return null;
     }

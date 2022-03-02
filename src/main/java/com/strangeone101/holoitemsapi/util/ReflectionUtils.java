@@ -1,8 +1,5 @@
 package com.strangeone101.holoitemsapi.util;
 
-
-import com.mojang.authlib.GameProfile;
-import com.strangeone101.holoitemsapi.HoloItemsAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -10,17 +7,12 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.chat.ComponentSerializer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ReflectionUtils {
 
@@ -32,9 +24,6 @@ public class ReflectionUtils {
     static Field loreField;
     static Field displayNameField;
     static Field profileField;
-
-    static Method asNMSCopy;
-    static Method getHandle;
 
     static void setup() {
         if (setup) return;
@@ -54,11 +43,8 @@ public class ReflectionUtils {
             Class craftStackClass = Class.forName(craft + ".inventory.CraftItemStack");
             Class craftPlayerClass = Class.forName(craft + ".entity.CraftPlayer");
 
-            asNMSCopy = craftStackClass.getDeclaredMethod("asNMSCopy", ItemStack.class);
-            getHandle = craftPlayerClass.getDeclaredMethod("getHandle");
-
             setup = true;
-        } catch (ClassNotFoundException | NoSuchFieldException | NoSuchMethodException e) {
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
             e.printStackTrace();
         }
     }
@@ -147,27 +133,6 @@ public class ReflectionUtils {
             displayNameField.set(meta, ComponentSerializer.toString(component));
             stack.setItemMeta(meta);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void forceCacheSkull(ItemStack stack) {
-        if (stack.getType() != Material.PLAYER_HEAD) return;
-        if (!setup) setup();
-
-        SkullMeta meta = (SkullMeta) stack.getItemMeta();
-        GameProfile profile = new GameProfile(meta.getOwningPlayer().getUniqueId(), meta.getOwningPlayer().getName());
-
-        Consumer<GameProfile> callback = (updatedProfile) -> {
-            try {
-                profileField.set(meta, updatedProfile);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        };
-        try {
-            HoloItemsAPI.getNMS().updateSkullCache(profile, callback);
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }
