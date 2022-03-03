@@ -3,10 +3,10 @@
   <groupId>com.strangeone101</groupId>
   <artifactId>HoloItemsAPI</artifactId>
   <versioning>
-    <release>0.8.8-hlc</release>
+    <release>0.8.9-hlc</release>
     <versions>
-      <version>0.8.8-hlc</version>
+      <version>0.8.9-hlc</version>
     </versions>
-    <lastUpdated>20220217174744</lastUpdated>
+    <lastUpdated>20220303061144</lastUpdated>
   </versioning>
 </metadata>
