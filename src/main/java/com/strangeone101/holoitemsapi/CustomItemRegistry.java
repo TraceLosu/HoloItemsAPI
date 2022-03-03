@@ -1,6 +1,5 @@
 package com.strangeone101.holoitemsapi;
 
-import com.strangeone101.holoitemsapi.itemevent.EventCache;
 import com.strangeone101.holoitemsapi.util.UUIDTagType;
 
 import org.bukkit.ChatColor;
@@ -36,8 +35,6 @@ public class CustomItemRegistry {
             NEXT_ID++;
             if (NEXT_ID == INVALID_ID) NEXT_ID++;
         }
-
-        EventCache.registerEvents(item);
     }
 
     /**
